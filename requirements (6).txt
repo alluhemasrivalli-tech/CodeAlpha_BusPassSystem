@@ -1,0 +1,5 @@
+# Task 3: Cloud-Based Bus Pass System
+# Python 3.8+
+
+flask>=2.3
+pytest>=7.0

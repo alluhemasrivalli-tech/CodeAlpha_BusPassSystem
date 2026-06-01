@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Search Routes — RoadWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ee;--card:#fff;--orange:#f97316;--od:#ea580c;--green:#16a34a;--red:#dc2626;--text:#1c1917;--muted:#78716c;--bdr:#e7e5e4;--syne:'Syne',sans-serif;--out:'Outfit',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--out);min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;background:var(--card);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;}
+.logo{font-family:var(--syne);font-size:1.4rem;font-weight:800;text-decoration:none;color:var(--text);}
+.logo span{color:var(--orange);}
+.back{font-size:.85rem;color:var(--muted);text-decoration:none;padding:.5rem 1rem;border:1px solid var(--bdr);border-radius:8px;transition:all .2s;}
+.back:hover{color:var(--orange);border-color:var(--orange);}
+
+.top{background:linear-gradient(135deg,#fff7ed,#fef3c7);padding:2.5rem 3rem;border-bottom:1px solid var(--bdr);}
+.top-inner{max-width:1100px;margin:0 auto;}
+h1{font-family:var(--syne);font-size:2rem;font-weight:800;margin-bottom:1.5rem;}
+.filters{display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;}
+.fg{display:flex;flex-direction:column;gap:.4rem;}
+label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+select,input[type=date]{padding:.65rem 1rem;border:1.5px solid var(--bdr);border-radius:10px;font-family:var(--out);font-size:.9rem;background:var(--card);outline:none;appearance:none;min-width:160px;}
+select:focus,input:focus{border-color:var(--orange);}
+.sbtn{padding:.65rem 1.75rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-family:var(--syne);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.sbtn:hover{background:var(--od);}
+
+.body{max-width:1100px;margin:0 auto;padding:2.5rem 3rem;}
+.count{font-size:.9rem;color:var(--muted);margin-bottom:1.5rem;}
+.count strong{color:var(--text);}
+
+.route-list{display:flex;flex-direction:column;gap:1.25rem;}
+.rc{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:1.75rem 2rem;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:1rem;align-items:center;transition:all .2s;}
+.rc:hover{border-color:var(--orange);box-shadow:0 4px 24px rgba(249,115,22,.1);}
+.rcities{font-family:var(--syne);font-size:1.15rem;font-weight:800;}
+.rcities .arr{color:var(--orange);margin:0 .4rem;}
+.route-no{font-size:.75rem;color:var(--muted);margin-top:.25rem;}
+.info-col{display:flex;flex-direction:column;gap:.25rem;}
+.info-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;}
+.info-val{font-size:.95rem;font-weight:600;}
+.avail-val{color:var(--green);}
+.avail-val.low{color:#d97706;}
+.avail-val.full{color:var(--red);}
+.fare-big{font-family:var(--syne);font-size:1.5rem;font-weight:800;color:var(--orange);}
+.book-btn{padding:.7rem 1.5rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-family:var(--syne);font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap;}
+.book-btn:hover{background:var(--od);}
+.book-btn.disabled{background:#d4d4d4;cursor:not-allowed;}
+.badge{font-size:.68rem;font-weight:600;padding:.2rem .6rem;border-radius:999px;}
+.badge.ac{background:rgba(59,130,246,.1);color:#3b82f6;}
+.badge.nonac{background:rgba(120,113,108,.1);color:var(--muted);}
+.empty{text-align:center;padding:4rem;color:var(--muted);}
+.empty h3{font-family:var(--syne);font-size:1.2rem;margin-bottom:.5rem;}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Road<span>Wave</span></a>
+  <a class="back" href="/">← Home</a>
+</nav>
+
+<div class="top">
+  <div class="top-inner">
+    <h1>Available Routes</h1>
+    <div class="filters">
+      <div class="fg"><label>From</label>
+        <select id="fc" onchange="reSearch()">
+          <option value="">Any City</option>
+          {% for c in cities %}<option {% if c==src %}selected{% endif %}>{{c}}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fg"><label>To</label>
+        <select id="tc" onchange="reSearch()">
+          <option value="">Any City</option>
+          {% for c in cities %}<option {% if c==dst %}selected{% endif %}>{{c}}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fg"><label>Date</label>
+        <input type="date" id="td" value="{{date}}" min="{{today}}" onchange="reSearch()">
+      </div>
+      <button class="sbtn" onclick="reSearch()">Search</button>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+  <p class="count">Showing <strong>{{routes|length}} route(s)</strong>{% if src %} from <strong>{{src}}</strong>{% endif %}{% if dst %} to <strong>{{dst}}</strong>{% endif %} on <strong>{{date}}</strong></p>
+
+  {% if routes %}
+  <div class="route-list">
+    {% for r in routes %}
+    <div class="rc">
+      <div>
+        <div class="rcities">{{r.source}} <span class="arr">→</span> {{r.destination}}</div>
+        <div class="route-no">Route {{r.route_no}} &nbsp;•&nbsp; <span class="badge {{'ac' if r.ac else 'nonac'}}">{{'❄ AC' if r.ac else 'Non-AC'}}</span></div>
+      </div>
+      <div class="info-col">
+        <span class="info-label">Distance</span>
+        <span class="info-val">{{r.distance_km}} km</span>
+      </div>
+      <div class="info-col">
+        <span class="info-label">Duration</span>
+        <span class="info-val">{{r.duration_hr}}h</span>
+      </div>
+      <div class="info-col">
+        <span class="info-label">Seats Left</span>
+        <span class="info-val avail-val {{'low' if r.available < 10 else ('full' if r.available == 0 else '')}}">
+          {{r.available}} / {{r.total_seats}}
+        </span>
+      </div>
+      <div>
+        <div class="fare-big">₹{{r.fare|int}}</div>
+        {% if r.available > 0 %}
+        <a class="book-btn" href="/book/{{r.id}}?date={{date}}" style="display:block;text-align:center;margin-top:.5rem;">Book →</a>
+        {% else %}
+        <button class="book-btn disabled" disabled>Full</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <h3>No routes found</h3>
+    <p>Try different cities or date</p>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function reSearch(){
+  const f=document.getElementById('fc').value, t=document.getElementById('tc').value, d=document.getElementById('td').value;
+  window.location.href=`/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${d}`;
+}
+</script>
+</body>
+</html>

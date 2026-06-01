@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Book Seat — RoadWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ee;--card:#fff;--orange:#f97316;--od:#ea580c;--green:#16a34a;--red:#dc2626;--text:#1c1917;--muted:#78716c;--bdr:#e7e5e4;--syne:'Syne',sans-serif;--out:'Outfit',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--out);min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;background:var(--card);border-bottom:1px solid var(--bdr);}
+.logo{font-family:var(--syne);font-size:1.4rem;font-weight:800;text-decoration:none;color:var(--text);}
+.logo span{color:var(--orange);}
+.back{font-size:.85rem;color:var(--muted);text-decoration:none;padding:.5rem 1rem;border:1px solid var(--bdr);border-radius:8px;}
+.back:hover{color:var(--orange);border-color:var(--orange);}
+
+.wrapper{max-width:960px;margin:0 auto;padding:2.5rem 2rem;display:grid;grid-template-columns:1fr 380px;gap:2rem;}
+h1{font-family:var(--syne);font-size:1.8rem;font-weight:800;margin-bottom:.25rem;}
+.route-tag{font-size:.85rem;color:var(--muted);margin-bottom:2rem;}
+.route-tag strong{color:var(--orange);}
+
+/* Route summary card */
+.summary{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:1.5rem;margin-bottom:2rem;}
+.summary h3{font-family:var(--syne);font-size:.85rem;color:var(--muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.06em;}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--bdr);}
+.sum-row:last-child{border-bottom:none;}
+.sum-label{font-size:.85rem;color:var(--muted);}
+.sum-val{font-size:.9rem;font-weight:600;}
+.sum-fare{font-family:var(--syne);font-size:1.4rem;font-weight:800;color:var(--orange);}
+
+/* Seat map */
+.seat-section{margin-bottom:2rem;}
+.seat-section h3{font-family:var(--syne);font-size:.95rem;margin-bottom:1rem;}
+.legend{display:flex;gap:1.25rem;margin-bottom:1rem;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted);}
+.leg-dot{width:18px;height:18px;border-radius:4px;border:2px solid;}
+.leg-dot.avail{background:rgba(22,163,74,.1);border-color:var(--green);}
+.leg-dot.booked{background:#fee2e2;border-color:var(--red);}
+.leg-dot.sel{background:var(--orange);border-color:var(--od);}
+
+.bus-body{background:var(--card);border:2px solid var(--bdr);border-radius:20px;padding:1.5rem;position:relative;}
+.driver-row{text-align:center;font-size:1.5rem;margin-bottom:1rem;color:var(--muted);}
+.seat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}
+.aisle{grid-column:2/3;width:0;}
+.seat{
+  padding:.5rem;border-radius:8px;border:2px solid var(--green);
+  background:rgba(22,163,74,.08);cursor:pointer;font-size:.75rem;
+  font-weight:600;text-align:center;transition:all .15s;
+  font-family:var(--syne);color:var(--green);
+}
+.seat:hover{background:rgba(22,163,74,.2);transform:scale(1.05);}
+.seat.booked{background:#fee2e2;border-color:var(--red);color:var(--red);cursor:not-allowed;}
+.seat.booked:hover{transform:none;}
+.seat.selected{background:var(--orange);border-color:var(--od);color:#fff;}
+.row-label{font-size:.65rem;color:var(--muted);text-align:center;margin-bottom:.25rem;font-family:var(--syne);}
+
+/* Booking form */
+.form-card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:1.75rem;position:sticky;top:100px;}
+.form-card h3{font-family:var(--syne);font-size:1.1rem;font-weight:800;margin-bottom:1.5rem;}
+.fg{margin-bottom:1.25rem;}
+label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;}
+input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--bdr);border-radius:10px;font-family:var(--out);font-size:.9rem;outline:none;transition:border-color .2s;}
+input:focus{border-color:var(--orange);}
+.selected-seat-display{padding:.7rem 1rem;border:1.5px dashed var(--orange);border-radius:10px;font-family:var(--syne);font-size:1rem;font-weight:700;color:var(--orange);text-align:center;background:rgba(249,115,22,.05);}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-top:1px solid var(--bdr);margin:1rem 0;}
+.total-label{font-weight:600;}
+.total-amt{font-family:var(--syne);font-size:1.3rem;font-weight:800;color:var(--orange);}
+.book-btn{width:100%;padding:.85rem;background:var(--orange);color:#fff;border:none;border-radius:12px;font-family:var(--syne);font-size:1rem;font-weight:800;cursor:pointer;transition:all .2s;}
+.book-btn:hover{background:var(--od);}
+.book-btn:disabled{background:#d4d4d4;cursor:not-allowed;}
+.msg{padding:.75rem 1rem;border-radius:8px;font-size:.82rem;margin-top:.75rem;display:none;}
+.msg.err{background:#fee2e2;color:var(--red);border:1px solid #fca5a5;}
+.msg.ok{background:#dcfce7;color:var(--green);border:1px solid #86efac;}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Road<span>Wave</span></a>
+  <a class="back" href="/search">← Back to Search</a>
+</nav>
+
+<div class="wrapper">
+  <div>
+    <h1>Select Your Seat</h1>
+    <p class="route-tag"><strong>{{route.source}} → {{route.destination}}</strong> &nbsp;•&nbsp; {{date}} &nbsp;•&nbsp; Route {{route.route_no}}</p>
+
+    <div class="summary">
+      <h3>Route Details</h3>
+      <div class="sum-row"><span class="sum-label">Distance</span><span class="sum-val">{{route.distance_km}} km</span></div>
+      <div class="sum-row"><span class="sum-label">Duration</span><span class="sum-val">{{route.duration_hr}} hrs</span></div>
+      <div class="sum-row"><span class="sum-label">Type</span><span class="sum-val">{{'❄ AC Bus' if route.ac else 'Non-AC Bus'}}</span></div>
+      <div class="sum-row"><span class="sum-label">Available Seats</span><span class="sum-val">{{avail|length}} / {{route.total_seats}}</span></div>
+      <div class="sum-row"><span class="sum-label">Fare</span><span class="sum-fare">₹{{route.fare|int}}</span></div>
+    </div>
+
+    <div class="seat-section">
+      <h3>🚌 Seat Map</h3>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot avail"></div> Available</div>
+        <div class="leg-item"><div class="leg-dot booked"></div> Booked</div>
+        <div class="leg-item"><div class="leg-dot sel"></div> Your Selection</div>
+      </div>
+      <div class="bus-body">
+        <div class="driver-row">🚗 Driver</div>
+        <div id="seatMap"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="form-card">
+      <h3>Passenger Details</h3>
+      <div class="fg">
+        <label>Full Name</label>
+        <input type="text" id="pname" placeholder="e.g. Ravi Kumar">
+      </div>
+      <div class="fg">
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="e.g. 9876543210">
+      </div>
+      <div class="fg">
+        <label>Selected Seat</label>
+        <div class="selected-seat-display" id="seatDisplay">Click a seat on the map</div>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Total Fare</span>
+        <span class="total-amt">₹{{route.fare|int}}</span>
+      </div>
+      <button class="book-btn" id="bookBtn" onclick="confirmBook()" disabled>Select a seat first</button>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const booked = {{ booked | tojson }};
+const avail  = {{ avail  | tojson }};
+const total  = {{ route.total_seats }};
+const cols   = total / 4;
+let selectedSeat = null;
+
+function buildMap() {
+  const map = document.getElementById('seatMap');
+  const rows = ['A','B','C','D'];
+  let html = '';
+  for (let c = 1; c <= cols; c++) {
+    html += `<div style="display:grid;grid-template-columns:1fr 20px 1fr 1fr;gap:.5rem;margin-bottom:.5rem;">`;
+    for (let ri = 0; ri < 4; ri++) {
+      if (ri === 2) html += `<div></div>`; // aisle gap
+      const seat = rows[ri] + c;
+      const cls  = booked.includes(seat) ? 'booked' : 'avail';
+      html += `<div class="seat ${cls}" id="seat_${seat}" onclick="selectSeat('${seat}')">${seat}</div>`;
+    }
+    html += `</div>`;
+  }
+  map.innerHTML = html;
+}
+
+function selectSeat(seat) {
+  if (booked.includes(seat)) return;
+  if (selectedSeat) document.getElementById('seat_'+selectedSeat)?.classList.remove('selected');
+  selectedSeat = seat;
+  document.getElementById('seat_'+seat).classList.add('selected');
+  document.getElementById('seatDisplay').textContent = seat;
+  const btn = document.getElementById('bookBtn');
+  btn.textContent = `→ Confirm Seat ${seat}`;
+  btn.disabled = false;
+}
+
+async function confirmBook() {
+  const name  = document.getElementById('pname').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const msg   = document.getElementById('msg');
+  if (!name || !phone || !selectedSeat) { showMsg('Please fill all fields and select a seat.','err'); return; }
+  document.getElementById('bookBtn').disabled = true;
+  document.getElementById('bookBtn').textContent = 'Booking...';
+  try {
+    const res  = await fetch('/book',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({passenger:name,phone:phone,route_id:{{route.id}},travel_date:'{{date}}',seat_no:selectedSeat})});
+    const data = await res.json();
+    if (data.success) { showMsg('✅ Booking confirmed! Redirecting...','ok'); setTimeout(()=>window.location.href=data.redirect,1200); }
+    else { showMsg(data.message,'err'); document.getElementById('bookBtn').disabled=false; document.getElementById('bookBtn').textContent=`→ Confirm Seat ${selectedSeat}`; }
+  } catch(e) { showMsg('Connection error.','err'); }
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text; el.className = `msg ${type}`; el.style.display='block';
+}
+
+buildMap();
+</script>
+</body>
+</html>

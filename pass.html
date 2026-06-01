@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bus Pass {{p.pass_id}} — RoadWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#fdf6ee;--card:#fff;--orange:#f97316;--od:#ea580c;--green:#16a34a;--red:#dc2626;--text:#1c1917;--muted:#78716c;--bdr:#e7e5e4;--syne:'Syne',sans-serif;--out:'Outfit',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--out);min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;background:var(--card);border-bottom:1px solid var(--bdr);}
+.logo{font-family:var(--syne);font-size:1.4rem;font-weight:800;text-decoration:none;color:var(--text);}
+.logo span{color:var(--orange);}
+.nav-links{display:flex;gap:1rem;}
+.nav-links a{font-size:.85rem;color:var(--muted);text-decoration:none;padding:.5rem 1rem;border:1px solid var(--bdr);border-radius:8px;}
+.nav-links a:hover{color:var(--orange);border-color:var(--orange);}
+
+.wrapper{max-width:680px;margin:3rem auto;padding:0 1.5rem;}
+
+/* The pass card */
+.pass-card{background:var(--card);border-radius:24px;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,.12);}
+.pass-top{background:linear-gradient(135deg, #f97316, #ea580c);padding:2rem 2.5rem;color:#fff;position:relative;overflow:hidden;}
+.pass-top::after{content:'🚌';position:absolute;right:-10px;bottom:-20px;font-size:7rem;opacity:.15;}
+.pass-logo{font-family:var(--syne);font-size:1rem;font-weight:800;opacity:.8;margin-bottom:1.25rem;}
+.pass-title{font-family:var(--syne);font-size:1.75rem;font-weight:800;margin-bottom:.25rem;}
+.pass-id{font-size:.8rem;opacity:.75;font-family:monospace;letter-spacing:.05em;}
+.status-badge{display:inline-block;margin-top:.75rem;padding:.3rem .8rem;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);}
+.status-badge.cancelled{background:rgba(0,0,0,.2);}
+
+.pass-body{padding:2rem 2.5rem;}
+.route-big{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;}
+.city{font-family:var(--syne);font-size:1.4rem;font-weight:800;}
+.arrow{font-size:1.5rem;color:var(--orange);}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem 2rem;margin-bottom:2rem;}
+.info-item{}
+.info-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin-bottom:.2rem;}
+.info-val{font-size:.95rem;font-weight:600;}
+
+.divider{border:none;border-top:2px dashed var(--bdr);margin:1.5rem 0;}
+
+/* QR section */
+.qr-section{display:flex;gap:2rem;align-items:center;}
+.qr-box{border:2px solid var(--bdr);border-radius:12px;padding:1rem;background:var(--bg);}
+.qr-info{flex:1;}
+.qr-info h4{font-family:var(--syne);font-size:.95rem;font-weight:800;margin-bottom:.5rem;}
+.qr-info p{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem;}
+.verify-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .75rem;border-radius:999px;font-size:.75rem;font-weight:700;}
+.verify-badge.ok{background:rgba(22,163,74,.1);color:var(--green);border:1px solid rgba(22,163,74,.3);}
+.verify-badge.fail{background:#fee2e2;color:var(--red);border:1px solid #fca5a5;}
+
+/* Actions */
+.actions{display:flex;gap:1rem;padding:1.5rem 2.5rem 2rem;border-top:1px solid var(--bdr);}
+.btn{padding:.7rem 1.5rem;border-radius:10px;font-family:var(--syne);font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;text-align:center;}
+.btn-primary{background:var(--orange);color:#fff;border:none;}
+.btn-primary:hover{background:var(--od);}
+.btn-danger{background:#fff;color:var(--red);border:2px solid var(--red);}
+.btn-danger:hover{background:#fee2e2;}
+.btn-secondary{background:var(--bg);color:var(--muted);border:1px solid var(--bdr);}
+
+.cancel-msg{padding:.75rem 1rem;background:#fee2e2;color:var(--red);border-radius:8px;font-size:.82rem;margin:.5rem 2.5rem;display:none;}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Road<span>Wave</span></a>
+  <div class="nav-links">
+    <a href="/search">Book Another</a>
+    <a href="/admin">Admin</a>
+  </div>
+</nav>
+
+<div class="wrapper">
+  {% if p.status == 'CONFIRMED' %}
+  <p style="text-align:center;color:var(--green);font-weight:600;margin-bottom:1.5rem;">✅ Booking Confirmed! Your pass is ready.</p>
+  {% endif %}
+
+  <div class="pass-card">
+    <div class="pass-top">
+      <div class="pass-logo">🚌 RoadWave</div>
+      <div class="pass-title">Bus Pass</div>
+      <div class="pass-id">{{ p.pass_id }}</div>
+      <div class="status-badge {% if p.status == 'CANCELLED' %}cancelled{% endif %}">
+        {% if p.status == 'CONFIRMED' %}✔ CONFIRMED{% else %}✖ CANCELLED{% endif %}
+      </div>
+    </div>
+
+    <div class="pass-body">
+      <div class="route-big">
+        <div class="city">{{ p.source }}</div>
+        <div class="arrow">→</div>
+        <div class="city">{{ p.destination }}</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Passenger</div>
+          <div class="info-val">{{ p.passenger }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Phone</div>
+          <div class="info-val">{{ p.phone }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Travel Date</div>
+          <div class="info-val">{{ p.travel_date }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Seat Number</div>
+          <div class="info-val">{{ p.seat_no }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Route</div>
+          <div class="info-val">{{ p.route_no }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Bus Type</div>
+          <div class="info-val">{{ '❄ AC' if p.ac else 'Non-AC' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Fare Paid</div>
+          <div class="info-val" style="color:var(--orange);font-family:var(--syne);font-size:1.1rem;">₹{{ p.fare_paid|int }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Booked At</div>
+          <div class="info-val">{{ p.booked_at[:16] }}</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="qr-section">
+        <div class="qr-box">
+          <div id="qrcode"></div>
+        </div>
+        <div class="qr-info">
+          <h4>QR Verified Pass</h4>
+          <p>Show this QR code to the bus conductor. It contains a SHA-256 checksum to prevent forgery.</p>
+          <div class="verify-badge {% if qr_valid %}ok{% else %}fail{% endif %}">
+            {% if qr_valid %}✔ Verified Authentic{% else %}⚠ Verification Failed{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if p.status == 'CONFIRMED' %}
+    <div class="cancel-msg" id="cancelMsg"></div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print Pass</button>
+      <button class="btn btn-danger" onclick="cancelPass()">✖ Cancel Pass</button>
+      <a class="btn btn-secondary" href="/search">Book Another</a>
+    </div>
+    {% else %}
+    <div class="actions">
+      <a class="btn btn-secondary" href="/search">Book New Ticket</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Generate QR code
+new QRCode(document.getElementById("qrcode"), {
+  text: {{ p.qr_code | tojson }},
+  width: 120, height: 120,
+  colorDark:"#1c1917", colorLight:"#fdf6ee",
+  correctLevel: QRCode.CorrectLevel.M
+});
+
+async function cancelPass() {
+  if (!confirm('Are you sure you want to cancel this pass? This cannot be undone.')) return;
+  const res  = await fetch('/cancel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pass_id:'{{p.pass_id}}'})});
+  const data = await res.json();
+  const msg  = document.getElementById('cancelMsg');
+  msg.textContent = data.message; msg.style.display='block';
+  if (data.success) setTimeout(()=>location.reload(), 1500);
+}
+</script>
+</body>
+</html>

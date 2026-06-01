@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin — RoadWave</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--bdr:#334155;--orange:#f97316;--green:#22c55e;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--syne:'Syne',sans-serif;--out:'Outfit',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--out);min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;background:var(--card);border-bottom:1px solid var(--bdr);}
+.logo{font-family:var(--syne);font-size:1.3rem;font-weight:800;text-decoration:none;color:var(--text);}
+.logo span{color:var(--orange);}
+.back{font-size:.85rem;color:var(--muted);text-decoration:none;padding:.5rem 1rem;border:1px solid var(--bdr);border-radius:8px;transition:all .2s;}
+.back:hover{color:var(--orange);border-color:var(--orange);}
+
+.wrapper{max-width:1200px;margin:0 auto;padding:2.5rem 2rem;}
+h1{font-family:var(--syne);font-size:2rem;font-weight:800;margin-bottom:2rem;}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:2.5rem;}
+.stat{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:1.5rem;}
+.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;}
+.stat-val{font-family:var(--syne);font-size:2rem;font-weight:800;}
+.stat-val.orange{color:var(--orange);}
+.stat-val.green{color:var(--green);}
+.stat-val.red{color:var(--red);}
+
+.section-title{font-family:var(--syne);font-size:1.1rem;font-weight:800;margin-bottom:1.25rem;}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:2rem;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:.75rem 1.25rem;text-align:left;border-bottom:1px solid var(--bdr);background:rgba(255,255,255,.02);}
+td{padding:.7rem 1.25rem;font-size:.85rem;border-bottom:1px solid rgba(51,65,85,.5);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.68rem;font-weight:700;}
+.badge.CONFIRMED{background:rgba(34,197,94,.15);color:var(--green);}
+.badge.CANCELLED{background:rgba(239,68,68,.15);color:var(--red);}
+.pass-link{color:var(--orange);text-decoration:none;font-family:monospace;}
+.pass-link:hover{text-decoration:underline;}
+
+.routes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.rc{background:rgba(255,255,255,.03);border:1px solid var(--bdr);border-radius:12px;padding:1.25rem;}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;}
+.rc-cities{font-family:var(--syne);font-size:.95rem;font-weight:800;}
+.rc-no{font-size:.72rem;color:var(--muted);}
+.rc-info{display:flex;gap:1rem;font-size:.78rem;color:var(--muted);}
+.rc-fare{font-family:var(--syne);font-size:1rem;font-weight:800;color:var(--orange);}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="/">Road<span>Wave</span> Admin</a>
+  <a class="back" href="/">← Public Site</a>
+</nav>
+
+<div class="wrapper">
+  <h1>📊 Admin Dashboard</h1>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total Bookings</div>
+      <div class="stat-val orange">{{passes|length}}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Confirmed</div>
+      <div class="stat-val green">{{confirmed}}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-val red">{{cancelled}}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-val orange">₹{{revenue|int}}</div>
+    </div>
+  </div>
+
+  <div class="section-title">All Bus Passes</div>
+  <div class="card">
+    {% if passes %}
+    <table>
+      <thead>
+        <tr><th>Pass ID</th><th>Passenger</th><th>Route</th><th>Date</th><th>Seat</th><th>Fare</th><th>Status</th><th>Booked At</th></tr>
+      </thead>
+      <tbody>
+        {% for p in passes %}
+        <tr>
+          <td><a class="pass-link" href="/pass/{{p.pass_id}}">{{p.pass_id}}</a></td>
+          <td>{{p.passenger}}</td>
+          <td>{{p.source}} → {{p.destination}}</td>
+          <td>{{p.travel_date}}</td>
+          <td>{{p.seat_no}}</td>
+          <td>₹{{p.fare_paid|int}}</td>
+          <td><span class="badge {{p.status}}">{{p.status}}</span></td>
+          <td>{{p.booked_at[:16]}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="padding:2rem;color:var(--muted);text-align:center">No passes booked yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="section-title">All Routes ({{routes|length}})</div>
+  <div class="routes-grid">
+    {% for r in routes %}
+    <div class="rc">
+      <div class="rc-top">
+        <div>
+          <div class="rc-cities">{{r.source}} → {{r.destination}}</div>
+          <div class="rc-no">{{r.route_no}} &nbsp;•&nbsp; {{r.distance_km}}km &nbsp;•&nbsp; {{r.duration_hr}}h</div>
+        </div>
+        <div class="rc-fare">₹{{r.fare|int}}</div>
+      </div>
+      <div class="rc-info">
+        <span>💺 {{r.total_seats}} seats</span>
+        <span>{{'❄ AC' if r.ac else 'Non-AC'}}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>

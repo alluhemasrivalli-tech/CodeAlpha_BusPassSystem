@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RoadWave — Cloud Bus Pass</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ee;--card:#fff;--orange:#f97316;--od:#ea580c;--green:#16a34a;--text:#1c1917;--muted:#78716c;--bdr:#e7e5e4;--syne:'Syne',sans-serif;--out:'Outfit',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--out);min-height:100vh;}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3rem;background:var(--card);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,0.05);}
+.logo{font-family:var(--syne);font-size:1.4rem;font-weight:800;}.logo span{color:var(--orange);}
+.nav-links{display:flex;gap:1.5rem;align-items:center;}
+.nav-links a{font-size:0.9rem;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--orange);}
+.nbtn{background:var(--orange);color:#fff;padding:0.5rem 1.25rem;border-radius:8px;font-size:0.85rem;font-weight:600;}
+.nbtn:hover{background:var(--od);color:#fff!important;}
+
+.hero{background:linear-gradient(135deg,#fff7ed,#fef3c7 50%,#fdf6ee);padding:5rem 3rem 4rem;position:relative;overflow:hidden;}
+.hero::after{content:'🚌';position:absolute;right:5%;top:50%;transform:translateY(-50%);font-size:9rem;opacity:0.08;}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+.badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);color:var(--orange);font-size:.75rem;font-weight:600;padding:.35rem .9rem;border-radius:999px;margin-bottom:1.5rem;}
+h1{font-family:var(--syne);font-size:3.5rem;font-weight:800;line-height:1.05;margin-bottom:1rem;}
+h1 em{color:var(--orange);font-style:normal;}
+.sub{font-size:1.05rem;color:var(--muted);max-width:480px;line-height:1.7;margin-bottom:2.5rem;}
+
+.scard{background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:2rem;box-shadow:0 4px 40px rgba(0,0,0,.08);max-width:800px;}
+.scard h3{font-family:var(--syne);font-size:1rem;margin-bottom:1.5rem;color:var(--muted);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;align-items:end;}
+label{display:block;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem;}
+select,input[type=date]{width:100%;padding:.75rem 1rem;border:1.5px solid var(--bdr);border-radius:10px;font-family:var(--out);font-size:.9rem;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s;appearance:none;}
+select:focus,input:focus{border-color:var(--orange);}
+.sbtn{padding:.75rem 2rem;background:var(--orange);color:#fff;border:none;border-radius:10px;font-family:var(--syne);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.sbtn:hover{background:var(--od);transform:translateY(-1px);}
+
+.section{padding:4rem 3rem;max-width:1100px;margin:0 auto;}
+h2{font-family:var(--syne);font-size:1.9rem;font-weight:800;margin-bottom:.5rem;}
+.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:2rem;}
+.fc{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:1.5rem;transition:all .2s;}
+.fc:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.08);}
+.fi{width:48px;height:48px;background:rgba(249,115,22,.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem;}
+.fc h4{font-family:var(--syne);font-size:.95rem;font-weight:700;margin-bottom:.4rem;}
+.fc p{font-size:.82rem;color:var(--muted);line-height:1.5;}
+
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:1.5rem;}
+.rc{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit;}
+.rc:hover{border-color:var(--orange);box-shadow:0 4px 20px rgba(249,115,22,.12);}
+.rrow{display:flex;align-items:center;justify-content:space-between;}
+.rcities{font-family:var(--syne);font-size:1rem;font-weight:700;}
+.rcities span{color:var(--orange);margin:0 .4rem;}
+.rbadge{font-size:.68rem;font-weight:600;padding:.2rem .6rem;border-radius:999px;background:rgba(22,163,74,.1);color:var(--green);}
+.rbadge.ac{background:rgba(59,130,246,.1);color:#3b82f6;}
+.rmeta{display:flex;gap:1.25rem;font-size:.8rem;color:var(--muted);}
+.fare{font-family:var(--syne);font-size:1.1rem;font-weight:800;color:var(--orange);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Road<span>Wave</span></div>
+  <div class="nav-links">
+    <a href="/search">All Routes</a>
+    <a href="/admin">Admin</a>
+    <a class="nbtn nav-links" href="/search">Book Now →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">☁️ Cloud-Hosted &nbsp;•&nbsp; Zero Ticket Loss</div>
+    <h1>Book Your Bus Pass<br><em>Instantly.</em></h1>
+    <p class="sub">Cloud-powered ticket booking with real-time seat availability, QR-verified passes — no queues, no paper, no loss.</p>
+    <div class="scard">
+      <h3>🔍 Find Your Route</h3>
+      <div class="sgrid">
+        <div><label>From</label>
+          <select id="fc"><option value="">Any City</option>{% for c in cities %}<option>{{c}}</option>{% endfor %}</select>
+        </div>
+        <div><label>To</label>
+          <select id="tc"><option value="">Any City</option>{% for c in cities %}<option>{{c}}</option>{% endfor %}</select>
+        </div>
+        <div><label>Date</label><input type="date" id="td" value="{{today}}" min="{{today}}"></div>
+        <button class="sbtn" onclick="doSearch()">Search →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section">
+  <h2>Why RoadWave?</h2>
+  <p style="color:var(--muted)">Cloud-native booking built for scale, reliability & security.</p>
+  <div class="fg">
+    <div class="fc"><div class="fi">☁️</div><h4>Cloud Hosted</h4><p>Scales dynamically under high traffic. No crashes during peak hours.</p></div>
+    <div class="fc"><div class="fi">🔒</div><h4>Zero Theft</h4><p>Every pass has a SHA-256 verified QR code. No duplicate or forged tickets.</p></div>
+    <div class="fc"><div class="fi">💺</div><h4>Live Seats</h4><p>Real-time seat map. Concurrent booking conflicts prevented at DB level.</p></div>
+    <div class="fc"><div class="fi">⚡</div><h4>Instant Pass</h4><p>Book and receive your QR pass in seconds. No waiting, no printing needed.</p></div>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0">
+  <h2>Popular Routes</h2>
+  <div class="rg" id="rg"></div>
+</div>
+
+<script>
+function doSearch(){
+  window.location.href=`/search?from=${encodeURIComponent(document.getElementById('fc').value)}&to=${encodeURIComponent(document.getElementById('tc').value)}&date=${document.getElementById('td').value}`;
+}
+fetch('/search',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.json()).then(routes=>{
+  document.getElementById('rg').innerHTML=routes.slice(0,6).map(r=>`
+    <a class="rc" href="/book/${r.id}?date={{today}}">
+      <div class="rrow"><div class="rcities">${r.source} <span>→</span> ${r.destination}</div>
+      <div class="rbadge ${r.ac?'ac':''}">${r.ac?'❄ AC':'Non-AC'}</div></div>
+      <div class="rmeta"><span>📍 ${r.distance_km}km</span><span>⏱ ${r.duration_hr}h</span><span>💺 ${r.available??r.total_seats} left</span></div>
+      <div class="fare">₹${r.fare.toFixed(0)}</div>
+    </a>`).join('');
+});
+</script>
+</body>
+</html>
